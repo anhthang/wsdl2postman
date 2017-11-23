@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://ws.eai.com.beans.com" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://ws.eai.com.beans.com" xmlns:intf="http://ws.eai.com.beans.com" xmlns:tns1="http://ws.eai.beans.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://ws.eai.beans.com" xmlns="http://www.w3.org/2001/XMLSchema">
+   <element name="serviceRequest">
+    <complexType>
+     <sequence>
+      <element name="serviceId" type="xsd:string"/>
+      <element name="xml" type="tns1:XmlHolder"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="XmlHolder">
+    <sequence>
+     <element name="OID" nillable="true" type="xsd:string"/>
+     <element name="content" nillable="true" type="xsd:string"/>
+     <element name="password" nillable="true" type="xsd:string"/>
+     <element name="securedContent" type="xsd:boolean"/>
+     <element name="securedPassword" type="xsd:boolean"/>
+     <element name="user" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <element name="serviceRequestResponse">
+    <complexType>
+     <sequence>
+      <element name="serviceRequestReturn" type="tns1:XmlHolder"/>
+     </sequence>
+    </complexType>
+   </element>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="serviceRequestResponse">
+
+      <wsdl:part element="tns1:serviceRequestResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="serviceRequestRequest">
+
+      <wsdl:part element="tns1:serviceRequest" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="EAIDelegateBean">
+
+      <wsdl:operation name="serviceRequest">
+
+         <wsdl:input message="impl:serviceRequestRequest" name="serviceRequestRequest"/>
+
+         <wsdl:output message="impl:serviceRequestResponse" name="serviceRequestResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="EAIDelegateBeanSoapBinding" type="impl:EAIDelegateBean">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="serviceRequest">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="serviceRequestRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="serviceRequestResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="EAIDelegateBeanService">
+
+      <wsdl:port binding="impl:EAIDelegateBeanSoapBinding" name="EAIDelegateBean">
+
+         <wsdlsoap:address location="http://www.quantumreservation.com:8089/ws/services/EAIDelegateBean"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

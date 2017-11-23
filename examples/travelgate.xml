@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="Hotel" targetNamespace="http://schemas.xmltravelgate.com/hub/2012/06" 
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" 
+    xmlns:i0="http://tempuri.org/" 
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" 
+    xmlns:wsa10="http://www.w3.org/2005/08/addressing" 
+    xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
+    xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" 
+    xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" 
+    xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" 
+    xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" 
+    xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:tns="http://schemas.xmltravelgate.com/hub/2012/06" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" 
+    xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
+    <wsdl:import namespace="http://tempuri.org/" location="http://hubxtghotel.xmltravelgate.com/Service/Travel/v2/Hotel.svc?wsdl=wsdl0"/>
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://schemas.xmltravelgate.com/hub/2012/06/Imports">
+            <xsd:import schemaLocation="http://hubxtghotel.xmltravelgate.com/Service/Travel/v2/Hotel.svc?xsd=xsd0" namespace="http://schemas.xmltravelgate.com/hub/2012/06"/>
+            <xsd:import schemaLocation="http://hubxtghotel.xmltravelgate.com/Service/Travel/v2/Hotel.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="IServiceHotel_Avail_InputMessage">
+        <wsdl:part name="parameters" element="tns:Avail"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_Avail_OutputMessage">
+        <wsdl:part name="parameters" element="tns:AvailResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_Reservation_InputMessage">
+        <wsdl:part name="parameters" element="tns:Reservation"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_Reservation_OutputMessage">
+        <wsdl:part name="parameters" element="tns:ReservationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_Valuation_InputMessage">
+        <wsdl:part name="parameters" element="tns:Valuation"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_Valuation_OutputMessage">
+        <wsdl:part name="parameters" element="tns:ValuationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_ReservationRead_InputMessage">
+        <wsdl:part name="parameters" element="tns:ReservationRead"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_ReservationRead_OutputMessage">
+        <wsdl:part name="parameters" element="tns:ReservationReadResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_Cancel_InputMessage">
+        <wsdl:part name="parameters" element="tns:Cancel"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_Cancel_OutputMessage">
+        <wsdl:part name="parameters" element="tns:CancelResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_ReservationList_InputMessage">
+        <wsdl:part name="parameters" element="tns:ReservationList"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_ReservationList_OutputMessage">
+        <wsdl:part name="parameters" element="tns:ReservationListResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_ModifyValuation_InputMessage">
+        <wsdl:part name="parameters" element="tns:ModifyValuation"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_ModifyValuation_OutputMessage">
+        <wsdl:part name="parameters" element="tns:ModifyValuationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_ModifyReservation_InputMessage">
+        <wsdl:part name="parameters" element="tns:ModifyReservation"/>
+    </wsdl:message>
+    <wsdl:message name="IServiceHotel_ModifyReservation_OutputMessage">
+        <wsdl:part name="parameters" element="tns:ModifyReservationResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="IServiceHotel">
+        <wsdl:operation name="Avail">
+            <wsdl:input wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/Avail" message="tns:IServiceHotel_Avail_InputMessage"/>
+            <wsdl:output wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/AvailResponse" message="tns:IServiceHotel_Avail_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="Reservation">
+            <wsdl:input wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/Reservation" message="tns:IServiceHotel_Reservation_InputMessage"/>
+            <wsdl:output wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/ReservationResponse" message="tns:IServiceHotel_Reservation_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="Valuation">
+            <wsdl:input wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/Valuation" message="tns:IServiceHotel_Valuation_InputMessage"/>
+            <wsdl:output wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/ValuationResponse" message="tns:IServiceHotel_Valuation_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="ReservationRead">
+            <wsdl:input wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/ReservationRead" message="tns:IServiceHotel_ReservationRead_InputMessage"/>
+            <wsdl:output wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/ReservationReadResponse" message="tns:IServiceHotel_ReservationRead_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="Cancel">
+            <wsdl:input wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/Cancel" message="tns:IServiceHotel_Cancel_InputMessage"/>
+            <wsdl:output wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/CancelResponse" message="tns:IServiceHotel_Cancel_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="ReservationList">
+            <wsdl:input wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/ReservationList" message="tns:IServiceHotel_ReservationList_InputMessage"/>
+            <wsdl:output wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/ReservationListResponse" message="tns:IServiceHotel_ReservationList_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="ModifyValuation">
+            <wsdl:input wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/ModifyValuation" message="tns:IServiceHotel_ModifyValuation_InputMessage"/>
+            <wsdl:output wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/ModifyValuationResponse" message="tns:IServiceHotel_ModifyValuation_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="ModifyReservation">
+            <wsdl:input wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/ModifyReservation" message="tns:IServiceHotel_ModifyReservation_InputMessage"/>
+            <wsdl:output wsaw:Action="http://schemas.xmltravelgate.com/hub/2012/06/IServiceHotel/ModifyReservationResponse" message="tns:IServiceHotel_ModifyReservation_OutputMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:service name="Hotel">
+        <wsdl:port name="InsecureHttpPort" binding="i0:InsecureHttpPort">
+            <soap:address location="http://hubxtghotel.xmltravelgate.com/Service/Travel/v2/Hotel.svc"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

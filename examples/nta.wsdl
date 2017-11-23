@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+    targetNamespace="http://wdinbd.nta.co.jp/service"
+    xmlns:svc="http://wdinbd.nta.co.jp/service"
+    xmlns:req="http://wdinbd.nta.co.jp/request"
+    xmlns:res="http://wdinbd.nta.co.jp/response"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl/">
+
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://wdinbd.nta.co.jp/request">
+            <xsd:element name="PingRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Echo" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                    </xsd:sequence>
+                    <xsd:attribute name="Token" type="xsd:string" />
+                    <xsd:attribute name="UserId" type="xsd:string" />
+                    <xsd:attribute name="Password" type="xsd:string" />
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="AvailabilityRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="AvailabilityCriteria" maxOccurs="1" minOccurs="0" >
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="Availability" maxOccurs="1" minOccurs="0" >
+                                        <xsd:complexType>
+                                            <xsd:attribute name="StateCode" type="xsd:string"/>
+                                            <xsd:attribute name="CityCode" type="xsd:string"/>
+                                            <xsd:attribute name="HotelCode" type="xsd:string"/>
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                    <xsd:element name="DateRange" maxOccurs="1" minOccurs="0" >
+                                        <xsd:complexType>
+                                            <xsd:attribute name="Start" type="xsd:date" />
+                                            <xsd:attribute name="End" type="xsd:date" />
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                    <xsd:element name="Candidates" maxOccurs="1" minOccurs="0" >
+                                        <xsd:complexType>
+                                            <xsd:attribute name="MealTypeCode" type="xsd:string" />
+                                            <xsd:attribute name="RoomKind" type="xsd:string" />
+                                            <xsd:attribute name="AvailableRooms" type="xsd:int" />
+                                            <xsd:attribute name="AdultCount" type="xsd:int" />
+                                            <xsd:attribute name="ChildCount" type="xsd:int" />
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                </xsd:sequence>
+                                <xsd:attribute name="AvailableOnly" type="xsd:boolean" />
+                                <xsd:attribute name="SummaryOnly" type="xsd:boolean"  />
+                                <xsd:attribute name="SortOrder" type="xsd:string"  />
+                                <xsd:attribute name="PlanPerHotel" type="xsd:int" />
+                                <xsd:attribute name="Limit" type="xsd:int" />
+                                <xsd:attribute name="Offset" type="xsd:int" />
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:attribute name="Token" type="xsd:string"  />
+                    <xsd:attribute name="UserId" type="xsd:string"  />
+                    <xsd:attribute name="Password" type="xsd:string"  />
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+        <xsd:schema targetNamespace="http://wdinbd.nta.co.jp/response">
+            <xsd:element name="PingResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Echo" type="xsd:string" maxOccurs="1" minOccurs="0"/>
+                        <xsd:element name="Error"  maxOccurs="1" minOccurs="0">
+                            <xsd:complexType>
+                                <xsd:attribute name="Code" type="xsd:string" />
+                                <xsd:attribute name="Message" type="xsd:string" />
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:attribute name="Token" type="xsd:string" />
+                    <xsd:attribute name="Status" type="xsd:string" />
+                    <xsd:attribute name="TimeStamp" type="xsd:dateTime" />
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="AvailabilityResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Error" maxOccurs="1" minOccurs="0" >
+                            <xsd:complexType>
+                                <xsd:attribute name="Code" type="xsd:string"  />
+                                <xsd:attribute name="Message" type="xsd:string"  />
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="RequestParameters" maxOccurs="1" minOccurs="1" >
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="AvailabilityCriteria" maxOccurs="1" minOccurs="1" >
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <xsd:element name="Availability" maxOccurs="1" minOccurs="1" >
+                                                    <xsd:complexType>
+                                                        <xsd:attribute name="StateCode" type="xsd:string" />
+                                                        <xsd:attribute name="CityCode" type="xsd:string" />
+                                                        <xsd:attribute name="HotelCode" type="xsd:string" />
+                                                    </xsd:complexType>
+                                                </xsd:element>
+                                                <xsd:element name="DateRange" maxOccurs="1" minOccurs="1" >
+                                                    <xsd:complexType>
+                                                        <xsd:attribute name="Start" type="xsd:date"  />
+                                                        <xsd:attribute name="End" type="xsd:date"  />
+                                                    </xsd:complexType>
+                                                </xsd:element>
+                                                <xsd:element name="Candidates" maxOccurs="1" minOccurs="1" >
+                                                    <xsd:complexType>
+                                                        <xsd:attribute name="MealTypeCode" type="xsd:string" />
+                                                        <xsd:attribute name="RoomKind" type="xsd:string" />
+                                                        <xsd:attribute name="AvailableRooms" type="xsd:int" />
+                                                        <xsd:attribute name="AdultCount" type="xsd:int" />
+                                                        <xsd:attribute name="ChildCount" type="xsd:int" />
+                                                    </xsd:complexType>
+                                                </xsd:element>
+                                            </xsd:sequence>
+                                            <xsd:attribute name="AvailableOnly" type="xsd:boolean" />
+                                            <xsd:attribute name="SummaryOnly" type="xsd:boolean" />
+                                            <xsd:attribute name="PlanPerHotel" type="xsd:int" />
+                                            <xsd:attribute name="SortOrder" type="xsd:string" />
+                                            <xsd:attribute name="Limit" type="xsd:int" />
+                                            <xsd:attribute name="Offset" type="xsd:int" />
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="Availabilities" maxOccurs="1" minOccurs="0" >
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="Availability" maxOccurs="unbounded" minOccurs="0" >
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <xsd:element name="HotelName" type="xsd:string" maxOccurs="1" minOccurs="1" />
+                                                <xsd:element name="RoomRates" maxOccurs="1" minOccurs="1" >
+                                                    <xsd:complexType>
+                                                        <xsd:sequence>
+                                                            <xsd:element name="RoomRate" maxOccurs="unbounded" minOccurs="1" >
+                                                                <xsd:complexType>
+                                                                    <xsd:sequence>
+                                                                        <xsd:element name="RoomTypeName" type="xsd:string" maxOccurs="1" minOccurs="1" />
+                                                                        <xsd:element name="RatePlanName" type="xsd:string" maxOccurs="1" minOccurs="1" />
+                                                                        <xsd:element name="Restriction" maxOccurs="1" minOccurs="1" >
+                                                                            <xsd:complexType>
+                                                                                <xsd:attribute name="MinGuestCount" type="xsd:int"  />
+                                                                                <xsd:attribute name="MaxGuestCount" type="xsd:int"  />
+                                                                                <xsd:attribute name="CutOff" type="xsd:int"  />
+                                                                                <xsd:attribute name="MinLengthOfStay" type="xsd:int"  />
+                                                                                <xsd:attribute name="MaxLengthOfStay" type="xsd:int"  />
+                                                                            </xsd:complexType>
+                                                                        </xsd:element>
+                                                                        <xsd:element name="DailyRates" maxOccurs="1" minOccurs="1" >
+                                                                            <xsd:complexType>
+                                                                                <xsd:sequence>
+                                                                                    <xsd:element name="DailyRate" maxOccurs="unbounded" minOccurs="1" >
+                                                                                        <xsd:complexType>
+                                                                                            <xsd:sequence>
+                                                                                                <xsd:element name="Rates" maxOccurs="1" minOccurs="1" >
+                                                                                                    <xsd:complexType>
+                                                                                                        <xsd:sequence>
+                                                                                                            <xsd:element name="Rate" maxOccurs="unbounded" minOccurs="1" >
+                                                                                                                <xsd:complexType>
+                                                                                                                <xsd:attribute name="AgeCategory" type="xsd:string"  />
+                                                                                                                <xsd:attribute name="GuestCount" type="xsd:int"  />
+                                                                                                                <xsd:attribute name="Amount" type="xsd:int"  />
+                                                                                                                </xsd:complexType>
+                                                                                                            </xsd:element>
+                                                                                                        </xsd:sequence>
+                                                                                                        <xsd:attribute name="CurrencyCode" type="xsd:string"  />
+                                                                                                    </xsd:complexType>
+                                                                                                </xsd:element>
+                                                                                                <xsd:element name="AvailableRooms" maxOccurs="1" minOccurs="1" >
+                                                                                                    <xsd:complexType>
+                                                                                                    <xsd:attribute name="NumberOfUnits" type="xsd:int"  />
+                                                                                                    </xsd:complexType>
+                                                                                                </xsd:element>
+                                                                                            </xsd:sequence>
+                                                                                            <xsd:attribute name="Date" type="xsd:date"  />
+                                                                                        </xsd:complexType>
+                                                                                    </xsd:element>
+                                                                                </xsd:sequence>
+                                                                            </xsd:complexType>
+                                                                        </xsd:element>
+                                                                    </xsd:sequence>
+                                                                    <xsd:attribute name="RoomTypeCode" type="xsd:string"  />
+                                                                    <xsd:attribute name="RatePlanCode" type="xsd:string"  />
+                                                                    <xsd:attribute name="MealTypeCode" type="xsd:string"  />
+                                                                </xsd:complexType>
+                                                            </xsd:element>
+                                                        </xsd:sequence>
+                                                    </xsd:complexType>
+                                                </xsd:element>
+                                            </xsd:sequence>
+                                            <xsd:attribute name="StateCode" type="xsd:string"  />
+                                            <xsd:attribute name="CityCode" type="xsd:string"  />
+                                            <xsd:attribute name="HotelCode" type="xsd:string"  />
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                </xsd:sequence>
+                                <xsd:attribute name="TotalCount" type="xsd:string"  />
+                                <xsd:attribute name="ResultCount" type="xsd:string"  />
+                                <xsd:attribute name="ResultPerPage" type="xsd:string"  />
+                                <xsd:attribute name="ResultPage" type="xsd:string"  />
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:attribute name="Token" type="xsd:string"  />
+                    <xsd:attribute name="Status" type="xsd:string"  />
+                    <xsd:attribute name="TimeStamp" type="xsd:dateTime"  />
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+
+
+    <wsdl:message name="doPingRequest">
+        <wsdl:part element="req:PingRequest" name="reqPingRequest"/>
+    </wsdl:message>
+    <wsdl:message name="doPingResponse">
+        <wsdl:part element="res:PingResponse" name="resPingRequest"/>
+    </wsdl:message>
+
+    <wsdl:message name="doAvailabilityRequest">
+        <wsdl:part element="req:AvailabilityRequest" name="reqAvailabilityRequest"/>
+    </wsdl:message>
+    <wsdl:message name="doAvailabilityResponse">
+        <wsdl:part element="res:AvailabilityResponse" name="resAvailabilityRequest"/>
+    </wsdl:message>
+
+
+    <wsdl:portType name="SamplePortType">
+        <wsdl:operation name="PingRequest">
+            <wsdl:input message="svc:doPingRequest" wsaw:Action="urn:PingRequest"/>
+            <wsdl:output message="svc:doPingResponse" wsaw:Action="urn:PingResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="AvailabilityRequest">
+            <wsdl:input message="svc:doAvailabilityRequest" wsaw:Action="urn:AvailabilityRequest"/>
+            <wsdl:output message="svc:doAvailabilityResponse" wsaw:Action="urn:AvailabilityResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+
+    <wsdl:binding name="NTAInboundWebserviceSoap" type="svc:SamplePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="PingRequest">
+            <soap:operation soapAction="urn:PingRequest"/>
+            <wsdl:input><soap:body use="literal"/></wsdl:input>
+            <wsdl:output><soap:body use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="AvailabilityRequest">
+            <soap:operation soapAction="urn:AvailabilityRequest"/>
+            <wsdl:input><soap:body use="literal"/></wsdl:input>
+            <wsdl:output><soap:body use="literal"/></wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+
+    <wsdl:service name="NTAInboundWebservice">
+        <wsdl:port binding="svc:NTAInboundWebserviceSoap" name="NTAInboundWebservice">
+            <soap:address location="http://direct9.nta.co.jp:80/api/service/NTAInboundWebservice.NTAInboundWebserviceSoap" />
+        </wsdl:port>
+    </wsdl:service>
+
+
+</wsdl:definitions>

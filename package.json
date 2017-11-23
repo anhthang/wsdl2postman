@@ -1,0 +1,28 @@
+{
+  "name": "wsdl2postman",
+  "version": "0.0.1",
+  "description": "transform wsdl to postman collection",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "debug": "^3.1.0",
+    "pretty-data": "^0.40.0",
+    "xml2js": "^0.4.19",
+    "xmlbuilder": "^9.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "transform",
+    "wsdl",
+    "postman",
+    "collection"
+  ],
+  "author": "Anh Thang Bui <buianhthang89@gmail.com>",
+  "license": "MIT"
+}
