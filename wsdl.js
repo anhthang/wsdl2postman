@@ -1,9 +1,17 @@
-const debug = require('debug')('wsdl2postman:build-raw')
+const debug = require('debug')('wsdl2postman:wsdl')
 const xmlbuilder = require('xmlbuilder')
 const _ = require('lodash')
 
 function castArray(data) {
     return _.castArray(data).filter(i => !!i)
+}
+
+function checkCase(key) {
+    if (key.startsWith('@')) {
+        // debug(`need to check key [${key}]`)
+    } else {
+        // throw new Error(`missing case [${key}]`)
+    }
 }
 
 /**
@@ -12,7 +20,8 @@ function castArray(data) {
  * @param {*} type 
  * @param {*} result 
  */
-function seekSimple(type, result) {
+function seekSimpleType(type, result) {
+    // debug('seekSimpleType')
     Object.keys(type).forEach(key => {
         switch (key) {
             case 'restriction':
@@ -24,20 +33,21 @@ function seekSimple(type, result) {
                 result['#comment'] = `list`
                 result['#text'] = type[key]['@itemType']
                 break
-            case 'union':
+            default:
+                // missing annotation, union
+                throw new Error(`simpleType [${key}] not implemented`)
                 break
-            // default:
-            //     break
         }
     })
     return result
 }
 
-function seekAttribute(attrs, result) {
-    // debug('seekAttribute', attrs, result)
+function seekAttribute(data, result) {
+    // debug('seekAttribute')
+    const attrs = castArray(data)
     attrs.forEach(attr => {
         if (!attr['@type']) {
-            result['@' + attr['@name']] = seekSimple(attr['simpleType'], {})
+            result['@' + attr['@name']] = seekSimpleType(attr['simpleType'], {})
         } else {
             result['@' + attr['@name']] = attr['@type']
         }
@@ -53,7 +63,6 @@ function seekSingleElement(element, result, complexTypes) {
 
     if (type) {
         const typeName = type.split(':').pop()
-        debug('typeName', typeName)
         if (!complexTypes[typeName]) {
             result[key] = type
         } else {
@@ -72,9 +81,9 @@ function seekSingleElement(element, result, complexTypes) {
  * @param {*} elements 
  * @param {*} result 
  */
-function seekElement(elements, result, complexTypes) {
-    // debug('seekElement', elements)
-
+function seekElement(data, result, complexTypes) {
+    // debug('seekElement')
+    const elements = castArray(data)
     elements.forEach(element => {
         seekSingleElement(element, result, complexTypes)
     })
@@ -94,20 +103,56 @@ function seekChoice(choice, result, complexTypes) {
     return result
 }
 
+/**
+ * The extension element extends an existing simpleType or complexType element.
+ * @param {*} extension 
+ * @param {*} result 
+ */
+function seekExtension(extension, result, complexTypes) {
+    // debug('seekExtension')
+    const base = extension['@base']
+    const baseName = base.split(':').pop()
+    if (!complexTypes[baseName]) {
+        result['#text'] = base
+    } else {
+        result = seekComplex(complexTypes[baseName], {}, complexTypes)
+    }
+
+    result = seekAttribute(extension['attribute'], result)
+    return result
+}
+
+function seekComplexContent(complexContent, result, complexTypes) {
+    // debug('seekComplexContent')
+    // (annotation?,((group|all|choice|sequence)?,((attribute|attributeGroup)*,anyAttribute?)))    
+    Object.keys(complexContent).map(key => {
+        switch (key) {
+            case 'extension':
+                result = seekExtension(complexContent[key], result, complexTypes)
+                break
+            case 'restriction':
+                break
+            default:
+                // throw new Error(`complexContent [${key}] not implemented`)
+                break
+        }
+    })
+
+    return result
+}
+
 function seekComplex(complex, result, complexTypes = {}) {
-    // debug('seekComplex', complex, result)
+    // debug('seekComplex')
     Object.keys(complex).forEach(key => {
         switch (key) {
             case 'attribute':
-                const attrs = castArray(complex[key])
-                result = seekAttribute(attrs, result)
+                result = seekAttribute(complex[key], result)
                 break
             case 'sequence':
                 Object.keys(complex[key]).forEach(sKey => {
                     switch (sKey) {
                         case 'element':
-                            const elements = castArray(complex[key][sKey])
-                            result = seekElement(elements, result, complexTypes)
+                            result = seekElement(complex[key][sKey], result, complexTypes)
                             break
                         case 'choice':
                             result = seekChoice(complex[key][sKey], result, complexTypes)
@@ -117,7 +162,12 @@ function seekComplex(complex, result, complexTypes = {}) {
                     }
                 })
                 break
+            case 'simpleContent':
+            case 'complexContent':
+                result = seekComplexContent(complex[key], result, complexTypes)
+                break
             default:
+                checkCase(key)
                 break
         }
     })

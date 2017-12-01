@@ -4,7 +4,7 @@ const { parseString } = require('xml2js')
 const parseAsync = promisify(parseString)
 const fs = require('fs')
 const { get } = require('lodash')
-const { buildRaw, castArray } = require('./raw')
+const { buildRaw, castArray } = require('./wsdl')
 const pretty = require('pretty-data')
 
 async function convert(xml) {
