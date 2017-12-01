@@ -10,8 +10,15 @@ function checkCase(key) {
     if (key.startsWith('@')) {
         // debug(`need to check key [${key}]`)
     } else {
-        // throw new Error(`missing case [${key}]`)
+        throw new Error(`missing case [${key}]`)
     }
+}
+
+function seekRestriction(type, result) {
+    // debug('seekRestriction')
+    const enumeration = type['restriction']['enumeration'].map(e => e['@value'])
+    result = 'enum:' + enumeration.join('/')
+    return result
 }
 
 /**
@@ -25,31 +32,34 @@ function seekSimpleType(type, result) {
     Object.keys(type).forEach(key => {
         switch (key) {
             case 'restriction':
-                const enumeration = type[key]['enumeration'].map(e => e['@value'])
-                result['#comment'] = `restricted enum value: ${enumeration.join(', ')}`
-                result['#text'] = type['@base']
+                result = seekRestriction(type, result)
                 break
             case 'list':
                 result['#comment'] = `list`
                 result['#text'] = type[key]['@itemType']
                 break
             default:
-                // missing annotation, union
-                throw new Error(`simpleType [${key}] not implemented`)
+                checkCase(key)
                 break
         }
     })
     return result
 }
 
-function seekAttribute(data, result) {
+function seekAttribute(data, result, complexTypes) {
     // debug('seekAttribute')
     const attrs = castArray(data)
     attrs.forEach(attr => {
-        if (!attr['@type']) {
+        if (attr['simpleType']) {
             result['@' + attr['@name']] = seekSimpleType(attr['simpleType'], {})
         } else {
-            result['@' + attr['@name']] = attr['@type']
+            const type = attr['@type']
+            const typeName = type.split(':').pop()
+            if (!complexTypes[typeName]) {
+                result['@' + attr['@name']] = type
+            } else {
+                result['@' + attr['@name']] = seekComplex(complexTypes[typeName], {}, complexTypes)
+            }
         }
     })
     return result
@@ -118,7 +128,7 @@ function seekExtension(extension, result, complexTypes) {
         result = seekComplex(complexTypes[baseName], {}, complexTypes)
     }
 
-    result = seekAttribute(extension['attribute'], result)
+    result = seekAttribute(extension['attribute'], result, complexTypes)
     return result
 }
 
@@ -133,7 +143,7 @@ function seekComplexContent(complexContent, result, complexTypes) {
             case 'restriction':
                 break
             default:
-                // throw new Error(`complexContent [${key}] not implemented`)
+                checkCase(key)
                 break
         }
     })
@@ -146,7 +156,7 @@ function seekComplex(complex, result, complexTypes = {}) {
     Object.keys(complex).forEach(key => {
         switch (key) {
             case 'attribute':
-                result = seekAttribute(complex[key], result)
+                result = seekAttribute(complex[key], result, complexTypes)
                 break
             case 'sequence':
                 Object.keys(complex[key]).forEach(sKey => {
@@ -165,6 +175,9 @@ function seekComplex(complex, result, complexTypes = {}) {
             case 'simpleContent':
             case 'complexContent':
                 result = seekComplexContent(complex[key], result, complexTypes)
+                break
+            case 'restriction':
+                result = seekRestriction(complex, result)
                 break
             default:
                 checkCase(key)
@@ -185,6 +198,9 @@ function buildRaw(schema) {
     // root here
     const complexTypes = {}
     castArray(schema['complexType']).forEach(complex => {
+        complexTypes[complex['@name']] = complex
+    })
+    castArray(schema['simpleType']).forEach(complex => {
         complexTypes[complex['@name']] = complex
     })
 
