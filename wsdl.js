@@ -29,8 +29,7 @@ function seekSimpleType(type, result) {
                 result = seekRestriction(type, result)
                 break
             case 'list':
-                result['#comment'] = `list`
-                result['#text'] = type[key]['@itemType']
+                result = type[key]['@itemType']
                 break
             default:
                 checkCase(key)
