@@ -37,9 +37,7 @@ async function convert(xml) {
         objSchema = {...objSchema, ...wsdlHelper(s)}
     })
 
-    // debug('schema', JSON.stringify(objSchema, null, 2))
-
-    let item = castArray(get(json, 'definitions.binding'))
+    let item = castArray(get(json, 'definitions.binding')).filter(i => !!i.operation)
 
     item = item.map(i => {
         let operation = castArray(get(i, 'operation'))

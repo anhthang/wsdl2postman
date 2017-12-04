@@ -29,7 +29,7 @@ function seekSimpleType(type, result) {
                 result = seekRestriction(type, result)
                 break
             case 'list':
-                result = type[key]['@itemType']
+                result = `list:${type[key]['@itemType']}`
                 break
             default:
                 checkCase(key)
