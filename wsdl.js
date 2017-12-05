@@ -14,10 +14,16 @@ function checkCase(key) {
     }
 }
 
-function seekRestriction(type, result) {
-    // debug('seekRestriction', type)
-    const enumeration = type['restriction']['enumeration'].map(e => e['@value'])
-    result = 'enum:' + enumeration.join('/')
+function seekRestriction(restriction, result) {
+    // debug('seekRestriction', restriction)
+    if (restriction['enumeration']) {
+        const enumeration = restriction['enumeration'].map(e => e['@value'])
+        result = 'enum:' + enumeration.join('/')
+        return result
+    }
+    
+    debug('seekRestriction', restriction)
+    result = `base: ${restriction['@base']}`
     return result
 }
 
@@ -26,7 +32,7 @@ function seekSimpleType(type, result) {
     Object.keys(type).forEach(key => {
         switch (key) {
             case 'restriction':
-                result = seekRestriction(type, result)
+                result = seekRestriction(type[key], result)
                 break
             case 'list':
                 result = `list:${type[key]['@itemType']}`
@@ -184,10 +190,6 @@ function seekComplex(complex, result, complexTypes = {}) {
         }
     })
 
-    const hasChild = complex['@sequence']
-    if (hasChild) {
-        return seekElement(hasChild, result, complexTypes)
-    }
     return result
 }
 
@@ -207,8 +209,14 @@ function seekSchema(schema) {
     Object.keys(schema).forEach(key => {
         let data
         switch (key) {
+            case 'attribute':
+                // data = seekAttribute(schema[key], {}, complexTypes)
+                break
             case 'element':
                 data = seekElement(schema[key], {}, complexTypes)
+                break
+            case 'import':
+                // ignore, get all from before step
                 break
             case 'complexType':
             case 'simpleType':
@@ -221,8 +229,7 @@ function seekSchema(schema) {
 
         if (_.isObject(data)) {
             Object.keys(data).forEach(key => {
-                debug('ss', data[key])
-                raws[key] = xmlbuilder.create({[key]: data[key]}, { encoding: 'utf-8' }).end()
+                raws[key] = xmlbuilder.create({ [key]: data[key] }, { encoding: 'utf-8' }).end()
             })
         }
     })

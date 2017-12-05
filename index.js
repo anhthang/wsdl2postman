@@ -1,26 +1,27 @@
 const debug = require('debug')('wsdl2postman:index')
-const { promisify } = require('util')
-const { parseString } = require('xml2js')
-const parseAsync = promisify(parseString)
+const { xml2js } = require('./parser')
 const fs = require('fs')
-const { get } = require('lodash')
+const { get, map, flattenDeep } = require('lodash')
 const { seekSchema, castArray } = require('./wsdl')
 const pretty = require('pretty-data')
 
+const { promisify } = require('util')
+const request = require('request')
+const getAsync = promisify(request.get)
+
+async function importSchema(schemaLocation) {
+    debug('importing schema')
+
+    const { body } = await getAsync(schemaLocation)
+    const json = await xml2js(body)
+    return json.schema
+}
+
 async function convert(xml) {
     debug('convert')
-    const json = await parseAsync(xml, {
-        charkey: '#text',
-        explicitArray: false,
-        mergeAttrs: true,
-        attrNameProcessors: [str => `@${str}`],
-        tagNameProcessors: [str => {
-            const tag = str.split(':')
-            return tag.pop()
-        }]
-    })
+    const json = await xml2js(xml)
 
-    fs.writeFileSync('juniper.json', JSON.stringify(json, null, 2))
+    fs.writeFileSync('travelgate.json', JSON.stringify(json, null, 2))
 
     const out = {
         info: {
@@ -30,12 +31,20 @@ async function convert(xml) {
     }
 
     const baseUrl = get(json, 'definitions.service.port.soap:address.@location')
-    const schema = castArray(get(json, 'definitions.types.schema'))
+    let schema = castArray(get(json, 'definitions.types.schema'))
+
+    const imports = flattenDeep(map(schema, 'import'))
+    const locations = map(imports, '@schemaLocation')
+    const otherSchemas = await Promise.all(locations.map(sl => importSchema(sl)))
+    // i think all import schema here, no need to check importSchema on each after get
+    schema = schema.concat(otherSchemas)
 
     let objSchema = {}
     schema.forEach(s => {
         objSchema = {...objSchema, ...seekSchema(s)}
     })
+
+    fs.writeFileSync('travelgate_xml.json', JSON.stringify(objSchema))
 
     let item = castArray(get(json, 'definitions.binding')).filter(i => !!i.operation)
 
@@ -72,7 +81,7 @@ async function convert(xml) {
     return out
 }
 
-Promise.resolve(convert(fs.readFileSync('./examples/juniper.wsdl', 'utf-8')))
+Promise.resolve(convert(fs.readFileSync('./examples/travelgate.wsdl', 'utf-8')))
     .catch(error => {
         console.log('eee', error.stack)
     })
