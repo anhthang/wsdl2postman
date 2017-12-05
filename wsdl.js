@@ -191,7 +191,8 @@ function seekComplex(complex, result, complexTypes = {}) {
     return result
 }
 
-function wsdlHelper(schema) {
+function seekSchema(schema) {
+    // debug('seekSchema')
     const raws = {}
 
     // root here
@@ -203,15 +204,30 @@ function wsdlHelper(schema) {
         complexTypes[complex['@name']] = complex
     })
 
-    schema['element'].forEach(s => {
-        const raw = {
-            [s['@name']]: seekComplex(s['complexType'], {}, complexTypes)
+    Object.keys(schema).forEach(key => {
+        let data
+        switch (key) {
+            case 'element':
+                data = seekElement(schema[key], {}, complexTypes)
+                break
+            case 'complexType':
+            case 'simpleType':
+                // ignore, will process later
+                break
+            default:
+                checkCase(key)
+                break
         }
 
-        raws[s['@name']] = xmlbuilder.create(raw, { encoding: 'utf-8' }).end()
+        if (_.isObject(data)) {
+            Object.keys(data).forEach(key => {
+                debug('ss', data[key])
+                raws[key] = xmlbuilder.create({[key]: data[key]}, { encoding: 'utf-8' }).end()
+            })
+        }
     })
 
     return raws
 }
 
-module.exports = { wsdlHelper, castArray }
+module.exports = { seekSchema, castArray }

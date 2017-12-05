@@ -4,7 +4,7 @@ const { parseString } = require('xml2js')
 const parseAsync = promisify(parseString)
 const fs = require('fs')
 const { get } = require('lodash')
-const { wsdlHelper, castArray } = require('./wsdl')
+const { seekSchema, castArray } = require('./wsdl')
 const pretty = require('pretty-data')
 
 async function convert(xml) {
@@ -20,7 +20,7 @@ async function convert(xml) {
         }]
     })
 
-    fs.writeFile('juniper.json', JSON.stringify(json, null, 2))
+    fs.writeFileSync('juniper.json', JSON.stringify(json, null, 2))
 
     const out = {
         info: {
@@ -34,7 +34,7 @@ async function convert(xml) {
 
     let objSchema = {}
     schema.forEach(s => {
-        objSchema = {...objSchema, ...wsdlHelper(s)}
+        objSchema = {...objSchema, ...seekSchema(s)}
     })
 
     let item = castArray(get(json, 'definitions.binding')).filter(i => !!i.operation)
