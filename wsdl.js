@@ -14,16 +14,45 @@ function checkCase(key) {
     }
 }
 
+function seekBase(base, complexTypes) {
+    // debug('seekBase', base)
+    const refType = base.split(':').pop()
+    if (!complexTypes[refType]) {
+        return base
+    } else {
+        return seekComplex(complexTypes[refType], {}, complexTypes)
+    }
+}
+
+function seekEnumeration(enumeration) {
+    return `enum:${enumeration.map(e => e['@value']).join('/')}`
+}
+
 function seekRestriction(restriction, result) {
     // debug('seekRestriction', restriction)
-    if (restriction['enumeration']) {
-        const enumeration = restriction['enumeration'].map(e => e['@value'])
-        result = 'enum:' + enumeration.join('/')
-        return result
-    }
-    
-    debug('seekRestriction', restriction)
-    result = `base: ${restriction['@base']}`
+    Object.keys(restriction).map(key => {
+        switch (key) {
+            case 'enumeration':
+                result = seekEnumeration(restriction[key])
+                break
+            case 'restriction':
+                result = seekRestriction(restriction[key], result)
+                break
+            case 'pattern':
+                result = restriction[key]['@value']
+                break
+            case 'minInclusive':
+            case 'maxInclusive':
+                break
+            // case 'attribute':
+            //     result = seekAttribute(restriction[key], result, complexTypes)
+            //     break
+            default:
+                checkCase(key)
+                break
+        }
+    })
+
     return result
 }
 
@@ -49,39 +78,47 @@ function seekAttribute(data, result, complexTypes) {
     // debug('seekAttribute', data)
     const attrs = castArray(data)
     attrs.forEach(attr => {
-        if (attr['simpleType']) {
-            result['@' + attr['@name']] = seekSimpleType(attr['simpleType'], {})
-        } else {
-            const type = attr['@type']
-            const typeName = type.split(':').pop()
-            if (!complexTypes[typeName]) {
-                result['@' + attr['@name']] = type
-            } else {
-                result['@' + attr['@name']] = seekComplex(complexTypes[typeName], {}, complexTypes)
+        const name = '@' + attr['@name']
+        Object.keys(attr).forEach(key => {
+            switch (key) {
+                case '@name':
+                    break
+                case '@type':
+                    result[name] = seekBase(attr[key], complexTypes)
+                    break
+                case 'simpleType':
+                    result[name] = seekSimpleType(attr[key], {})
+                    break
+                default:
+                    break
             }
-        }
+        })
     })
+
     return result
 }
 
 function seekSingleElement(element, result, complexTypes) {
     // debug('seekSingleElement', element)
-    const key = element['@name']
+    const name = element['@name']
     const type = element['@type']
-    // check max/min occurs here
 
-    if (type) {
-        const typeName = type.split(':').pop()
-        if (!complexTypes[typeName]) {
-            result[key] = type
-        } else {
-            result[key] = seekComplex(complexTypes[typeName], {}, complexTypes)
+    Object.keys(element).forEach(key => {
+        switch (key) {
+            case '@name':
+                break
+            case '@type':
+                result[name] = seekBase(element[key], complexTypes)
+                break
+            case 'complexType':
+                result[name] = seekComplex(element[key], {}, complexTypes)
+                break
+            default:
+                checkCase(key)
+                break
         }
-    } else if (element['complexType']) {
-        result[key] = seekComplex(element['complexType'], {}, complexTypes)
-    } else {
-        result[key] = type
-    }
+    })
+
     return result
 }
 
@@ -110,15 +147,23 @@ function seekChoice(choice, result, complexTypes) {
 
 function seekExtension(extension, result, complexTypes) {
     // debug('seekExtension', extension)
-    const base = extension['@base']
-    const baseName = base.split(':').pop()
-    if (!complexTypes[baseName]) {
-        result['#text'] = base
-    } else {
-        result = seekComplex(complexTypes[baseName], {}, complexTypes)
-    }
+    Object.keys(extension).forEach(key => {
+        switch (key) {
+            case '@base':
+                result = seekBase(extension[key], complexTypes)
+                break
+            case 'attribute':
+                result = seekAttribute(extension[key], result, complexTypes)
+                break
+            case 'sequence':
+                result = seekSequence(extension[key], result, complexTypes)
+                break
+            default:
+                checkCase(key)
+                break
+        }
+    })
 
-    result = seekAttribute(extension['attribute'], result, complexTypes)
     return result
 }
 

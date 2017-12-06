@@ -21,7 +21,7 @@ async function convert(xml) {
     debug('convert')
     const json = await xml2js(xml)
 
-    fs.writeFileSync('travelgate.json', JSON.stringify(json, null, 2))
+    fs.writeFileSync('juniper.json', JSON.stringify(json, null, 2))
 
     const out = {
         info: {
@@ -33,7 +33,7 @@ async function convert(xml) {
     const baseUrl = get(json, 'definitions.service.port.soap:address.@location')
     let schema = castArray(get(json, 'definitions.types.schema'))
 
-    const otherSchemas = []
+    let otherSchemas = []
     const imports = flattenDeep(map(schema, 'import')).filter(i => !!i)
     if (imports.length) {
         const locations = map(imports, '@schemaLocation').filter(i => !!i)
@@ -84,7 +84,7 @@ async function convert(xml) {
     return out
 }
 
-Promise.resolve(convert(fs.readFileSync('./examples/travelgate.wsdl', 'utf-8')))
+Promise.resolve(convert(fs.readFileSync('./examples/juniper.wsdl', 'utf-8')))
     .catch(error => {
         console.log('eee', error.stack)
     })
