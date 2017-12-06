@@ -33,20 +33,23 @@ async function convert(xml) {
     const baseUrl = get(json, 'definitions.service.port.soap:address.@location')
     let schema = castArray(get(json, 'definitions.types.schema'))
 
-    const imports = flattenDeep(map(schema, 'import'))
-    const locations = map(imports, '@schemaLocation')
-    const otherSchemas = await Promise.all(locations.map(sl => importSchema(sl)))
-    // i think all import schema here, no need to check importSchema on each after get
+    const otherSchemas = []
+    const imports = flattenDeep(map(schema, 'import')).filter(i => !!i)
+    if (imports.length) {
+        const locations = map(imports, '@schemaLocation').filter(i => !!i)
+        if (locations.length) {
+            otherSchemas = await Promise.all(locations.map(sl => importSchema(sl)))
+        }
+    }
+
     schema = schema.concat(otherSchemas)
 
     let objSchema = {}
     schema.forEach(s => {
-        objSchema = {...objSchema, ...seekSchema(s)}
+        objSchema = { ...objSchema, ...seekSchema(s) }
     })
 
-    fs.writeFileSync('travelgate_xml.json', JSON.stringify(objSchema))
-
-    let item = castArray(get(json, 'definitions.binding')).filter(i => !!i.operation)
+    let item = castArray(get(json, 'definitions.portType')).filter(i => !!i.operation)
 
     item = item.map(i => {
         let operation = castArray(get(i, 'operation'))
@@ -60,7 +63,7 @@ async function convert(xml) {
                     method: get(i, 'binding.@verb') || 'POST',
                     header: [{
                         key: 'SOAPAction',
-                        value: get(o, 'soap:operation.@soapAction'),
+                        value: get(o, 'input.@Action'),
                         disabled: false
                     }, {
                         key: 'Content-Type',
