@@ -49,6 +49,18 @@ async function convert(xml) {
         objSchema = { ...objSchema, ...seekSchema(s) }
     })
 
+    const soapAction = {}
+    castArray(get(json, 'definitions.binding'))
+        .forEach(b => {
+            const operationName = get(b.operation, '@name')
+            if (operationName) {
+                soapAction[operationName] = {
+                    action: get(b.operation, 'operation.@soapAction'),
+                    method: get(b, 'binding.@verb') || 'POST'
+                }
+            }
+        })
+
     let item = castArray(get(json, 'definitions.portType')).filter(i => !!i.operation)
 
     item = item.map(i => {
@@ -56,26 +68,29 @@ async function convert(xml) {
 
         return {
             name: get(i, '@name'),
-            item: operation.map(o => ({
-                name: get(o, '@name'),
-                request: {
-                    url: baseUrl ? `${baseUrl}/${get(o, '@name')}` : '',
-                    method: get(i, 'binding.@verb') || 'POST',
-                    header: [{
-                        key: 'SOAPAction',
-                        value: get(o, 'input.@Action'),
-                        disabled: false
-                    }, {
-                        key: 'Content-Type',
-                        value: 'application/xml;charset=utf-8',
-                        disabled: false
-                    }],
-                    body: {
-                        mode: 'raw',
-                        raw: pretty.pd.xml(objSchema[get(o, '@name')])
+            item: operation.map(o => {
+                const operationName = get(o, '@name')
+                return {
+                    name: operationName,
+                    request: {
+                        url: baseUrl ? `${baseUrl}/${operationName}` : '',
+                        method: soapAction[operationName] ? soapAction[operationName].method : '',
+                        header: [{
+                            key: 'SOAPAction',
+                            value: soapAction[operationName] ? soapAction[operationName].action : get(o, 'input.@Action'),
+                            disabled: false
+                        }, {
+                            key: 'Content-Type',
+                            value: 'application/xml;charset=utf-8',
+                            disabled: false
+                        }],
+                        body: {
+                            mode: 'raw',
+                            raw: pretty.pd.xml(objSchema[operationName])
+                        }
                     }
                 }
-            }))
+            })
         }
     })
 
