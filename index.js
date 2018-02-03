@@ -3,6 +3,7 @@ const { xml2js } = require('./parser')
 const fs = require('fs')
 const { get, map, flattenDeep } = require('lodash')
 const { seekSchema, castArray } = require('./wsdl')
+const { getNamespaces } = require('./soap')
 const pretty = require('pretty-data')
 
 const { promisify } = require('util')
@@ -21,7 +22,8 @@ async function convert(xml) {
     debug('convert')
     const json = await xml2js(xml)
 
-    fs.writeFileSync('juniper.json', JSON.stringify(json, null, 2))
+    // fs.writeFileSync('nta.json', JSON.stringify(json, null, 2))
+    debug('namespaces', getNamespaces(get(json, 'definitions')))
 
     const out = {
         info: {
@@ -99,7 +101,7 @@ async function convert(xml) {
     return out
 }
 
-Promise.resolve(convert(fs.readFileSync('./examples/juniper.wsdl', 'utf-8')))
+Promise.resolve(convert(fs.readFileSync('./examples/nta.wsdl', 'utf-8')))
     .catch(error => {
         console.log('eee', error.stack)
     })

@@ -1,5 +1,5 @@
 const { promisify } = require('util')
-const { parseString } = require('xml2js')
+const { parseString, processors } = require('xml2js')
 const parseAsync = promisify(parseString)
 
 async function xml2js(xml) {
@@ -11,10 +11,7 @@ async function xml2js(xml) {
             const attr = str.split(':')
             return `@${attr.pop()}`
         }],
-        tagNameProcessors: [str => {
-            const tag = str.split(':')
-            return tag.pop()
-        }]
+        tagNameProcessors: [processors.stripPrefix]
     })
 
     return json
