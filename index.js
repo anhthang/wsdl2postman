@@ -22,8 +22,7 @@ async function convert(xml) {
     debug('convert')
     const json = await xml2js(xml)
 
-    // fs.writeFileSync('nta.json', JSON.stringify(json, null, 2))
-    debug('namespaces', getNamespaces(get(json, 'definitions')))
+    const namespace = getNamespaces(get(json, 'definitions'))
 
     const out = {
         info: {
@@ -32,7 +31,9 @@ async function convert(xml) {
         }
     }
 
-    const baseUrl = get(json, 'definitions.service.port.soap:address.@location')
+    const ports = castArray(get(json, 'definitions.service.port'))
+    const baseUrl = ports[0].address['@location']
+
     let schema = castArray(get(json, 'definitions.types.schema'))
 
     let otherSchemas = []
@@ -75,7 +76,7 @@ async function convert(xml) {
                 return {
                     name: operationName,
                     request: {
-                        url: baseUrl ? `${baseUrl}/${operationName}` : '',
+                        url: baseUrl || '',
                         method: soapAction[operationName] ? soapAction[operationName].method : '',
                         header: [{
                             key: 'SOAPAction',
@@ -101,7 +102,7 @@ async function convert(xml) {
     return out
 }
 
-Promise.resolve(convert(fs.readFileSync('./examples/nta.wsdl', 'utf-8')))
+Promise.resolve(convert(fs.readFileSync('./examples/travelgate.wsdl', 'utf-8')))
     .catch(error => {
         console.log('eee', error.stack)
     })

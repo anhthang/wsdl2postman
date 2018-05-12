@@ -37,7 +37,7 @@ function createSOAPEnvelope(prefix, nsUri) {
 // }
 
 function getNamespaces(definitions) {
-    debug('getNamespaces')
+    // debug('getNamespaces')
     const namespaces = {}
     for (let prefix in definitions) {
         if (definitions.hasOwnProperty(prefix) && prefix.startsWith('@')) {
@@ -68,7 +68,7 @@ function getNamespaces(definitions) {
 }
 
 function getPrefix(namespaces, nsURI) {
-    debug('getPrefix')
+    // debug('getPrefix')
     const prefix = invert(namespaces)
     switch (nsURI) {
         case 'http://www.w3.org/XML/1998/namespace':
