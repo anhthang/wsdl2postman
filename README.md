@@ -1,3 +1,5 @@
+**This project has been deprecated. Try this [soap-converter](https://github.com/anhthang/soap-converter)**
+
 # WSDL to Postman Collection
 
 > Transform WSDL file or URL to Postman Collection
